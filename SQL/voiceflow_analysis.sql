@@ -1,8 +1,7 @@
-```sql
--- =====================================================
--- Q1. How is interaction volume distributed across 
---     customers? 
--- ===================================================== 
+
+ Q1. How is interaction volume distributed across 
+     customers? 
+
  
 SELECT 
     customer_id, 
@@ -12,10 +11,10 @@ GROUP BY customer_id
 ORDER BY interaction_count DESC; 
  
  
--- ===================================================== 
--- Q2. Do higher-usage customers also have better 
---     outcomes? 
--- ===================================================== 
+
+ Q2. Do higher-usage customers also have better 
+   outcomes? 
+
 SELECT 
     c.customer_id, 
     c.customer_name, 
@@ -76,10 +75,9 @@ GROUP BY
 ORDER BY total_interactions DESC; 
  
  
--- ===================================================== 
--- Q3. Which customers have a relatively high number 
---     of escalated interactions? 
--- ===================================================== 
+Q3. Which customers have a relatively high number 
+    of escalated interactions? 
+
 SELECT 
     customer_id, 
     COUNT(*) AS escalated_interactions 
@@ -90,10 +88,10 @@ HAVING COUNT(*) >= 10
 ORDER BY escalated_interactions DESC; 
  
  
--- ===================================================== 
--- Q4. Which interaction types have the highest 
---     escalation rates? 
--- ===================================================== 
+
+ Q4. Which interaction types have the highest 
+    escalation rates? 
+
  
 SELECT 
     it.interaction_type, 
@@ -127,10 +125,9 @@ GROUP BY
  
 ORDER BY escalation_rate DESC; 
  
- 
--- ===================================================== 
--- Q5. Which customers have no recorded interactions? 
--- ===================================================== 
+
+ Q5. Which customers have no recorded interactions? 
+
 SELECT 
     c.customer_id, 
     c.customer_name, 
@@ -143,9 +140,9 @@ WHERE i.interaction_id IS NULL
 ORDER BY c.customer_id; 
  
  
--- ===================================================== 
--- Q6. How does interaction volume change month by month? 
--- ===================================================== 
+
+ Q6. How does interaction volume change month by month? 
+
 SELECT 
     DATE_TRUNC('month', interaction_date) AS month, 
     COUNT(*) AS interaction_count 
@@ -154,10 +151,10 @@ GROUP BY DATE_TRUNC('month', interaction_date)
 ORDER BY month; 
  
  
--- ===================================================== 
--- Q7. How does each month's interaction volume compare 
---     with the previous month? 
--- ===================================================== 
+
+Q7. How does each month's interaction volume compare 
+    with the previous month? 
+
 SELECT 
     month, 
     interaction_count, 
@@ -190,9 +187,8 @@ FROM (
 ORDER BY month; 
  
  
--- ===================================================== 
--- Q8. Which customers rank highest by interaction volume? 
--- ===================================================== 
+ Q8. Which customers rank highest by interaction volume? 
+
 SELECT 
     customer_id, 
     COUNT(*) AS interaction_count, 
@@ -208,10 +204,9 @@ GROUP BY customer_id
 ORDER BY interaction_rank; 
  
  
--- ===================================================== 
--- Q9. What was the latest recorded interaction for 
---     each customer? 
--- ===================================================== 
+Q9. What was the latest recorded interaction for 
+  each customer? 
+
 SELECT 
     customer_id, 
     interaction_id, 
@@ -237,10 +232,10 @@ WHERE rn = 1
 ORDER BY customer_id; 
  
  
--- ===================================================== 
--- Q10. How much interaction data is missing duration 
---      information? 
--- ===================================================== 
+
+ Q10. How much interaction data is missing duration 
+     information? 
+
 SELECT 
     COUNT(*) AS total_interactions, 
     COUNT(duration_seconds) AS interactions_with_duration, 
@@ -255,10 +250,10 @@ SELECT
 FROM interactions;
 
 
--- =====================================================
--- Q11. Why do some customers have higher repeat
---      interaction rates than others?
--- =====================================================
+
+ Q11. Why do some customers have higher repeat
+    interaction rates than others?
+
 
 SELECT
     it.interaction_type,
@@ -291,4 +286,4 @@ GROUP BY
     it.interaction_type
 
 ORDER BY repeat_rate DESC;
-```
+
