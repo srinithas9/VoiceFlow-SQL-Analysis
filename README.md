@@ -79,6 +79,33 @@ GROUP BY customer_id
 ORDER BY interaction_count DESC;
 ```
 
+### Output
+
+| Customer ID | Interaction Count |
+| ----------- | ----------------: |
+| C006        |               106 |
+| C002        |               104 |
+| C004        |                99 |
+| C001        |                85 |
+| C003        |                80 |
+| C007        |                58 |
+| C016        |                55 |
+| C012        |                55 |
+| C015        |                53 |
+| C009        |                52 |
+| C023        |                48 |
+| C010        |                47 |
+| C017        |                46 |
+| C008        |                45 |
+| C011        |                44 |
+| C013        |                42 |
+| C014        |                42 |
+| C022        |                36 |
+| C021        |                32 |
+| C019        |                29 |
+| C025        |                23 |
+| C020        |                19 |
+
 ### Finding
 
 Interaction volume varies significantly between customers.
@@ -127,22 +154,44 @@ GROUP BY c.customer_id, c.customer_name
 ORDER BY total_interactions DESC;
 ```
 
+### Output
+
+| Customer      | Interactions | Completed | Escalated | Incomplete | Completion Rate | Repeat Rate |
+| ------------- | -----------: | --------: | --------: | ---------: | --------------: | ----------: |
+| QuickCart     |          106 |        88 |        12 |          6 |          83.02% |       9.43% |
+| BrightMart    |          104 |        79 |        14 |         11 |          75.96% |      11.54% |
+| CarePlus      |           99 |        65 |        20 |         14 |          65.66% |      13.13% |
+| Nova Hotels   |           85 |        60 |        13 |         12 |          70.59% |      12.94% |
+| FinEdge       |           80 |        53 |        15 |         12 |          66.25% |       8.75% |
+| SecureLife    |           58 |        39 |         9 |         10 |          67.24% |      13.79% |
+| CloudWorks    |           55 |        44 |         7 |          4 |          80.00% |      12.73% |
+| AutoDrive     |           55 |        43 |         6 |          6 |          78.18% |      16.36% |
+| HomeEase      |           53 |        33 |        14 |          6 |          62.26% |       7.55% |
+| MediConnect   |           52 |        44 |         5 |          3 |          84.62% |      11.54% |
+| FreshFoods    |           48 |        32 |         6 |         10 |          66.67% |       6.25% |
+| StyleHub      |           47 |        33 |        11 |          3 |          70.21% |      21.28% |
+| LegalPoint    |           46 |        30 |         7 |          9 |          65.22% |      10.87% |
+| TravelNest    |           45 |        30 |        10 |          5 |          66.67% |       8.89% |
+| EduBridge     |           44 |        27 |         9 |          8 |          61.36% |      11.36% |
+| FoodBasket    |           42 |        31 |         8 |          3 |          73.81% |      16.67% |
+| GreenEnergy   |           42 |        32 |         6 |          4 |          76.19% |      19.05% |
+| TechNova      |           36 |        27 |         3 |          6 |          75.00% |       2.78% |
+| FlyHigh       |           32 |        28 |         4 |          0 |          87.50% |      18.75% |
+| WellnessFirst |           29 |        21 |         5 |          3 |          72.41% |      20.69% |
+| PrimeAuto     |           23 |        16 |         4 |          3 |          69.57% |       4.35% |
+| BookWorld     |           19 |        13 |         6 |          0 |          68.42% |      10.53% |
+| LearnSphere   |            0 |         0 |         0 |          0 |               — |           — |
+| UrbanStay     |            0 |         0 |         0 |          0 |               — |           — |
+| MetroFinance  |            0 |         0 |         0 |          0 |               — |           — |
+
 ### Key Observations
 
-| Customer | Interactions | Completion Rate |
-| -------- | -----------: | --------------: |
-| C006     |          106 |          83.02% |
-| C004     |           99 |          65.66% |
-| C009     |           52 |          84.62% |
-| C021     |           32 |          87.50% |
-
-The results show that higher interaction volume does not consistently correspond to higher completion rates.
-
-For example:
-
+* C006 has **106 interactions** with an **83.02% completion rate**.
 * C004 has **99 interactions** with a **65.66% completion rate**.
 * C009 has only **52 interactions** but an **84.62% completion rate**.
 * C021 has only **32 interactions** with an **87.50% completion rate**.
+
+The results show that higher interaction volume does not consistently correspond to higher completion rates.
 
 ### Finding
 
@@ -170,6 +219,19 @@ GROUP BY customer_id
 HAVING COUNT(*) >= 10
 ORDER BY escalated_interactions DESC;
 ```
+
+### Output
+
+| Customer ID | Escalated Interactions |
+| ----------- | ---------------------: |
+| C004        |                     20 |
+| C003        |                     15 |
+| C015        |                     14 |
+| C002        |                     14 |
+| C001        |                     13 |
+| C006        |                     12 |
+| C010        |                     11 |
+| C008        |                     10 |
 
 ### Finding
 
@@ -201,7 +263,7 @@ GROUP BY it.interaction_type
 ORDER BY escalation_rate DESC;
 ```
 
-### Finding
+### Output
 
 | Interaction Type | Total | Escalated | Escalation Rate |
 | ---------------- | ----: | --------: | --------------: |
@@ -210,6 +272,8 @@ ORDER BY escalation_rate DESC;
 | Booking          |   249 |        39 |          15.66% |
 | Enquiry          |   246 |        38 |          15.45% |
 | Cancellation     |   249 |        38 |          15.26% |
+
+### Finding
 
 Support has the highest observed escalation rate at **17.97%**, followed by Complaint at **16.74%**.
 
@@ -240,6 +304,14 @@ WHERE i.interaction_id IS NULL
 ORDER BY c.customer_id;
 ```
 
+### Output
+
+| Customer ID | Customer Name | Industry    | Status   |
+| ----------- | ------------- | ----------- | -------- |
+| C005        | UrbanStay     | Hospitality | Inactive |
+| C018        | MetroFinance  | Finance     | Inactive |
+| C024        | LearnSphere   | Education   | Inactive |
+
 ### Finding
 
 Three customers have no recorded interactions:
@@ -265,7 +337,7 @@ GROUP BY DATE_TRUNC('month', interaction_date)
 ORDER BY month;
 ```
 
-### Finding
+### Output
 
 | Month     | Interactions |
 | --------- | -----------: |
@@ -278,6 +350,8 @@ ORDER BY month;
 | July      |          152 |
 | August    |          141 |
 | September |          137 |
+
+### Finding
 
 July recorded the highest interaction volume with **152 interactions**, while May recorded the lowest with **113**.
 
@@ -316,6 +390,20 @@ FROM (
 ORDER BY month;
 ```
 
+### Output
+
+| Month     | Interaction Count | Previous Month | Change | Percentage Change |
+| --------- | ----------------: | -------------: | -----: | ----------------: |
+| January   |               132 |              — |      — |                 — |
+| February  |               121 |            132 |    -11 |            -8.33% |
+| March     |               140 |            121 |    +19 |           +15.70% |
+| April     |               126 |            140 |    -14 |           -10.00% |
+| May       |               113 |            126 |    -13 |           -10.32% |
+| June      |               138 |            113 |    +25 |           +22.12% |
+| July      |               152 |            138 |    +14 |           +10.14% |
+| August    |               141 |            152 |    -11 |            -7.24% |
+| September |               137 |            141 |     -4 |            -2.84% |
+
 ### Finding
 
 * Largest increase: **June, +22.12%**
@@ -336,6 +424,33 @@ FROM interactions
 GROUP BY customer_id
 ORDER BY interaction_rank;
 ```
+
+### Output
+
+| Customer ID | Interaction Count | Interaction Rank |
+| ----------- | ----------------: | ---------------: |
+| C006        |               106 |                1 |
+| C002        |               104 |                2 |
+| C004        |                99 |                3 |
+| C001        |                85 |                4 |
+| C003        |                80 |                5 |
+| C007        |                58 |                6 |
+| C016        |                55 |                7 |
+| C012        |                55 |                7 |
+| C015        |                53 |                9 |
+| C009        |                52 |               10 |
+| C023        |                48 |               11 |
+| C010        |                47 |               12 |
+| C017        |                46 |               13 |
+| C008        |                45 |               14 |
+| C011        |                44 |               15 |
+| C013        |                42 |               16 |
+| C014        |                42 |               16 |
+| C022        |                36 |               18 |
+| C021        |                32 |               19 |
+| C019        |                29 |               20 |
+| C025        |                23 |               21 |
+| C020        |                19 |               22 |
 
 ### Finding
 
@@ -371,6 +486,35 @@ WHERE rn = 1
 ORDER BY customer_id;
 ```
 
+### Output
+
+| Customer ID | Interaction ID | Interaction Date | Status     | Interaction Type ID |
+| ----------- | -------------: | ---------------- | ---------- | ------------------: |
+| C001        |  Latest record | Latest date      | Status     |                Type |
+| C002        |  Latest record | 2026-09-29       | Escalated  |                   — |
+| C003        |  Latest record | Latest date      | Status     |                Type |
+| C004        |  Latest record | 2026-09-30       | Escalated  |                   — |
+| C006        |  Latest record | Latest date      | Status     |                Type |
+| C007        |  Latest record | Latest date      | Status     |                Type |
+| C008        |  Latest record | Latest date      | Status     |                Type |
+| C009        |  Latest record | Latest date      | Status     |                Type |
+| C010        |  Latest record | Latest date      | Status     |                Type |
+| C011        |  Latest record | Latest date      | Status     |                Type |
+| C012        |  Latest record | 2026-09-25       | Escalated  |                   — |
+| C013        |  Latest record | Latest date      | Status     |                Type |
+| C014        |  Latest record | 2026-09-24       | Incomplete |                   — |
+| C015        |  Latest record | Latest date      | Status     |                Type |
+| C016        |  Latest record | 2026-09-20       | Escalated  |                   — |
+| C017        |  Latest record | Latest date      | Status     |                Type |
+| C019        |  Latest record | Latest date      | Status     |                Type |
+| C020        |  Latest record | Latest date      | Status     |                Type |
+| C021        |  Latest record | Latest date      | Status     |                Type |
+| C022        |  Latest record | Latest date      | Status     |                Type |
+| C023        |  Latest record | Latest date      | Status     |                Type |
+| C025        |  Latest record | Latest date      | Status     |                Type |
+
+> **Note:** Replace the placeholder values above with the exact Q9 output from pgAdmin when pasting the README. The query itself determines the exact interaction ID, date, status, and interaction type for each customer.
+
 ### Purpose
 
 This query provides the most recent interaction for each customer.
@@ -396,7 +540,7 @@ SELECT
 FROM interactions;
 ```
 
-### Result
+### Output
 
 | Metric                | Value |
 | --------------------- | ----: |
@@ -473,7 +617,22 @@ GROUP BY it.interaction_type
 ORDER BY repeat_rate DESC;
 ```
 
-This provides a direction for further investigation into repeated customer interactions.
+### Purpose
+
+This query investigates whether repeated interactions are concentrated in particular interaction types.
+
+### Output
+| Interaction Type | Total Interactions | Repeated Interactions | Repeat Rate |
+| ---------------- | -----------------: | --------------------: | ----------: |
+| Support          |                217 |                    34 |      15.67% |
+| Cancellation     |                249 |                    31 |      12.45% |
+| Enquiry          |                246 |                    29 |      11.79% |
+| Booking          |                249 |                    28 |      11.24% |
+| Complaint        |                239 |                    23 |       9.62% |
+
+
+### Finding
+Support has the highest observed repeat interaction rate at 15.67%, followed by Cancellation at 12.45%. Complaint has the lowest observed repeat rate at 9.62%.
 
 ---
 
