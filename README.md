@@ -1,7 +1,5 @@
 # VoiceFlow — SQL Business Analysis
 
-## 1. Business Problem
-
 VoiceFlow is an AI voice assistant startup that helps businesses automate customer interactions such as enquiries, bookings, support requests, cancellations, and complaints.
 
 As the number of interactions grows, leadership wants to understand whether increased interaction volume represents better business outcomes for its customers.
@@ -9,8 +7,6 @@ As the number of interactions grows, leadership wants to understand whether incr
 ### Main Business Question
 
 > **Does a higher number of interactions necessarily mean better business outcomes for VoiceFlow customers?**
-
-To investigate this, a dummy dataset was created and analyzed using SQL to identify patterns across customers, interaction outcomes, interaction types, and time periods.
 
 ---
 
@@ -40,7 +36,7 @@ The dataset contains three tables:
 
 ### Time Period
 
-January 2026 – September 2026
+**January 2026 – September 2026**
 
 The dataset is synthetic and was created specifically for this analysis.
 
@@ -48,27 +44,28 @@ The dataset is synthetic and was created specifically for this analysis.
 
 ## 3. Data Model
 
-The analysis uses a simple relational model consisting of customers, interaction types, and interactions.
+The analysis uses three related tables: `customers`, `interaction_types`, and `interactions`.
 
-<img width="1536" height="1024" alt="ER Diagram" src="https://github.com/user-attachments/assets/b2cf0822-2e0e-4094-9999-72bf1f2c6e2d" />
+<img width="1536" height="1024" alt="ER Diagram" src="https://github.com/user-attachments/assets/f484e641-900f-44b8-994f-072b2a00d932" />
 
 ### Relationships
 
 * One customer can have many interactions.
 * One interaction type can be associated with many interactions.
 * Each interaction belongs to one customer and one interaction type.
-
-`interactions` acts as the central event table connecting customers with interaction types.
+* `interactions` is the central event table connecting customers and interaction types.
 
 ---
 
-# 4. SQL Analysis
+# 4. Analysis
 
-## Q1. Which customers have the highest interaction volume?
+## Analysis 1 — Customer Interaction Volume
 
-### Purpose
+### Question
 
-First, customer usage was measured to understand how interaction volume differs between customers.
+**How is interaction volume distributed across customers?**
+
+### Query
 
 ```sql
 SELECT
@@ -79,7 +76,11 @@ GROUP BY customer_id
 ORDER BY interaction_count DESC;
 ```
 
-### Output
+### Reasoning
+
+Before comparing interaction volume with outcomes, customer usage needs to be established. This shows whether customers use VoiceFlow at similar or different levels.
+
+### Actual Output
 
 | Customer ID | Interaction Count |
 | ----------- | ----------------: |
@@ -106,26 +107,30 @@ ORDER BY interaction_count DESC;
 | C025        |                23 |
 | C020        |                19 |
 
-### Finding
+### Visualization
+
+<img width="2617" height="1297" alt="customer_interaction_volume" src="https://github.com/user-attachments/assets/4a08611a-27e5-4f8e-92a9-47d6b91b7808" />
+
+### Key Finding
 
 Interaction volume varies significantly between customers.
 
-* C006 had the highest interaction volume with **106 interactions**.
-* C020 had the lowest non-zero volume with **19 interactions**.
+* **C006** has the highest volume with **106 interactions**.
+* **C020** has the lowest non-zero volume with **19 interactions**.
 
-This establishes the usage differences that can then be compared with customer outcomes.
+### Connection to Main Question
 
-### Visualization
-
-<img width="672" height="420" alt="Interaction volume by customer" src="https://github.com/user-attachments/assets/b515ea88-3825-4d00-a05c-1de543e1bc91" />
+This establishes that customers use VoiceFlow at different levels. The next question is whether customers with higher interaction volumes also achieve better outcomes.
 
 ---
 
-## Q2. Does higher interaction volume correspond to better outcomes?
+## Analysis 2 — Interaction Volume vs Completion Rate
 
-### Purpose
+### Question
 
-Interaction volume alone does not indicate whether interactions are successful. Therefore, interaction volume was compared with completion, escalation, incomplete interactions, and repeat rates.
+**Does higher interaction volume correspond to better outcomes?**
+
+### Query
 
 ```sql
 SELECT
@@ -154,7 +159,11 @@ GROUP BY c.customer_id, c.customer_name
 ORDER BY total_interactions DESC;
 ```
 
-### Output
+### Reasoning
+
+Interaction volume by itself does not show whether customer interactions are successful. Therefore, interaction volume is compared with completed, escalated, incomplete, and repeated interactions.
+
+### Actual Output
 
 | Customer      | Interactions | Completed | Escalated | Incomplete | Completion Rate | Repeat Rate |
 | ------------- | -----------: | --------: | --------: | ---------: | --------------: | ----------: |
@@ -184,30 +193,38 @@ ORDER BY total_interactions DESC;
 | UrbanStay     |            0 |         0 |         0 |          0 |               — |           — |
 | MetroFinance  |            0 |         0 |         0 |          0 |               — |           — |
 
-### Key Observations
+### Visualization
 
-* C006 has **106 interactions** with an **83.02% completion rate**.
-* C004 has **99 interactions** with a **65.66% completion rate**.
-* C009 has only **52 interactions** but an **84.62% completion rate**.
-* C021 has only **32 interactions** with an **87.50% completion rate**.
+<img width="1944" height="1297" alt="volume_vs_completion_rate" src="https://github.com/user-attachments/assets/2ec6e5d9-47f9-477f-bb14-809d3e07f219" />
 
-The results show that higher interaction volume does not consistently correspond to higher completion rates.
+### Key Finding
 
-### Finding
+Higher interaction volume does not consistently correspond to higher completion rates.
+
+For example:
+
+* **C006:** 106 interactions → **83.02% completion**
+* **C004:** 99 interactions → **65.66% completion**
+* **C009:** 52 interactions → **84.62% completion**
+* **C021:** 32 interactions → **87.50% completion**
+
+### Connection to Main Question
+
+This is the central analysis. The results show that customers with substantially different interaction volumes can have similar or very different completion rates.
+
+Therefore:
 
 > **Interaction volume alone is not a sufficient indicator of successful VoiceFlow usage.**
 
-### Visualization
-
-<img width="672" height="378" alt="Interaction volume vs completion rate" src="https://github.com/user-attachments/assets/1d48fbfe-3bf9-48b2-a97e-36c267192c5c" />
-
 ---
 
-## Q3. Which customers have high numbers of escalated interactions?
+## Analysis 3 — High Escalation Customers
 
-### Purpose
+### Question
 
-After comparing volume with completion rates, escalation was investigated as another operational outcome.
+**Which customers have high numbers of escalated interactions?**
+
+### Query
 
 ```sql
 SELECT
@@ -220,7 +237,11 @@ HAVING COUNT(*) >= 10
 ORDER BY escalated_interactions DESC;
 ```
 
-### Output
+### Reasoning
+
+The previous analysis showed that interaction volume does not consistently correspond to completion. Escalation is another operational outcome that can indicate where interactions require additional handling.
+
+### Actual Output
 
 | Customer ID | Escalated Interactions |
 | ----------- | ---------------------: |
@@ -233,17 +254,29 @@ ORDER BY escalated_interactions DESC;
 | C010        |                     11 |
 | C008        |                     10 |
 
-### Finding
+### Visualization
+
+<img width="1957" height="1297" alt="high_escalation_customers" src="https://github.com/user-attachments/assets/976094ea-498d-4ba9-b230-8336bedd73b0" />
+
+### Key Finding
 
 Eight customers have at least 10 escalated interactions.
 
-C004 has the highest number with **20 escalated interactions**.
+**C004** has the highest count with **20 escalated interactions**.
 
-However, escalation counts are influenced by interaction volume, so escalation rate provides additional context.
+### Connection to Main Question
+
+This adds another outcome dimension to the volume analysis. High interaction volume can create more opportunities for escalation, so raw escalation counts need to be interpreted alongside the total number of interactions.
 
 ---
 
-## Q4. Which interaction types have higher escalation rates?
+## Analysis 4 — Escalation Rate by Interaction Type
+
+### Question
+
+**Which interaction types have higher escalation rates?**
+
+### Query
 
 ```sql
 SELECT
@@ -263,7 +296,11 @@ GROUP BY it.interaction_type
 ORDER BY escalation_rate DESC;
 ```
 
-### Output
+### Reasoning
+
+Raw escalation counts are affected by interaction volume. Calculating escalation rates allows different interaction types to be compared relative to their total interaction volume.
+
+### Actual Output
 
 | Interaction Type | Total | Escalated | Escalation Rate |
 | ---------------- | ----: | --------: | --------------: |
@@ -273,60 +310,27 @@ ORDER BY escalation_rate DESC;
 | Enquiry          |   246 |        38 |          15.45% |
 | Cancellation     |   249 |        38 |          15.26% |
 
-### Finding
-
-Support has the highest observed escalation rate at **17.97%**, followed by Complaint at **16.74%**.
-
-These differences indicate areas for further investigation but do not establish causation.
-
 ### Visualization
 
-<img width="672" height="378" alt="Escalation rate by interaction type" src="https://github.com/user-attachments/assets/99f77672-1188-410d-8f30-655f8493e2df" />
+<img width="1958" height="1297" alt="escalation_rate_by_type" src="https://github.com/user-attachments/assets/d2410260-b267-488b-b80a-3d7ca20616af" />
+
+### Key Finding
+
+**Support** has the highest observed escalation rate at **17.97%**, followed by **Complaint at 16.74%**.
+
+### Connection to Main Question
+
+The main question asks whether interaction volume alone represents better outcomes. Escalation rates show that the nature of interactions also matters when evaluating customer outcomes, rather than relying only on total interaction counts.
 
 ---
 
-## Q5. Which customers have no recorded interactions?
+## Analysis 5 — Monthly Interaction Volume
 
-### Purpose
+### Question
 
-Identify customers with no interaction records.
+**How does interaction volume change over time?**
 
-```sql
-SELECT
-    c.customer_id,
-    c.customer_name,
-    c.industry,
-    c.status
-FROM customers c
-LEFT JOIN interactions i
-    ON c.customer_id = i.customer_id
-WHERE i.interaction_id IS NULL
-ORDER BY c.customer_id;
-```
-
-### Output
-
-| Customer ID | Customer Name | Industry    | Status   |
-| ----------- | ------------- | ----------- | -------- |
-| C005        | UrbanStay     | Hospitality | Inactive |
-| C018        | MetroFinance  | Finance     | Inactive |
-| C024        | LearnSphere   | Education   | Inactive |
-
-### Finding
-
-Three customers have no recorded interactions:
-
-* C005 — UrbanStay
-* C018 — MetroFinance
-* C024 — LearnSphere
-
-All three are currently marked as inactive.
-
-This analysis demonstrates how a `LEFT JOIN` and `IS NULL` can identify missing relationships.
-
----
-
-## Q6. How does interaction volume change over time?
+### Query
 
 ```sql
 SELECT
@@ -337,7 +341,11 @@ GROUP BY DATE_TRUNC('month', interaction_date)
 ORDER BY month;
 ```
 
-### Output
+### Reasoning
+
+The business question involves increasing interaction volume. Therefore, interaction activity should also be examined across time to determine whether the dataset shows a consistent growth pattern.
+
+### Actual Output
 
 | Month     | Interactions |
 | --------- | -----------: |
@@ -351,19 +359,30 @@ ORDER BY month;
 | August    |          141 |
 | September |          137 |
 
-### Finding
+### Visualization
 
-July recorded the highest interaction volume with **152 interactions**, while May recorded the lowest with **113**.
+<img width="2177" height="1253" alt="monthly_interaction_volume" src="https://github.com/user-attachments/assets/c94898f3-d4f8-4566-82ac-ea9520fb6505" />
+
+### Key Finding
+
+* Highest monthly volume: **July — 152 interactions**
+* Lowest monthly volume: **May — 113 interactions**
 
 The data shows monthly fluctuation rather than a consistent upward trend.
 
-### Visualization
+### Connection to Main Question
 
-<img width="672" height="420" alt="Monthly interaction volume" src="https://github.com/user-attachments/assets/1e2033eb-4d22-4537-8299-a5ce03531105" />
+The analysis shows that interaction volume does not continuously increase throughout the period. This provides time-based context for interpreting the relationship between usage and outcomes.
 
 ---
 
-## Q7. What is the month-over-month change in interaction volume?
+## Analysis 6 — Month-over-Month Change
+
+### Question
+
+**What is the month-over-month change in interaction volume?**
+
+### Query
 
 ```sql
 SELECT
@@ -390,7 +409,11 @@ FROM (
 ORDER BY month;
 ```
 
-### Output
+### Reasoning
+
+Monthly totals show the overall pattern, while month-over-month change quantifies how much interaction volume increases or decreases between consecutive months.
+
+### Actual Output
 
 | Month     | Interaction Count | Previous Month | Change | Percentage Change |
 | --------- | ----------------: | -------------: | -----: | ----------------: |
@@ -404,190 +427,32 @@ ORDER BY month;
 | August    |               141 |            152 |    -11 |            -7.24% |
 | September |               137 |            141 |     -4 |            -2.84% |
 
-### Finding
+### Visualization
+
+<img width="2177" height="1253" alt="month_over_month_change" src="https://github.com/user-attachments/assets/d2a8a39c-85c6-4ac5-8e54-5d3ac0136c37" />
+
+### Key Finding
 
 * Largest increase: **June, +22.12%**
 * Largest decline: **May, -10.32%**
 
-Interaction volume fluctuates from month to month, but the dataset does not show a consistent growth pattern.
+Interaction volume fluctuates from month to month rather than following a consistent growth pattern.
+
+### Connection to Main Question
+
+The month-over-month analysis confirms that changes in interaction volume should not automatically be interpreted as improvements in customer outcomes. Volume needs to be evaluated together with outcome measures such as completion and escalation.
 
 ---
 
-## Q8. How do customers rank by interaction volume?
+# 5. Additional Business Question
 
-```sql
-SELECT
-    customer_id,
-    COUNT(*) AS interaction_count,
-    RANK() OVER (ORDER BY COUNT(*) DESC) AS interaction_rank
-FROM interactions
-GROUP BY customer_id
-ORDER BY interaction_rank;
-```
+### Question
 
-### Output
+**Why do some customers have higher repeat interaction rates than others?**
 
-| Customer ID | Interaction Count | Interaction Rank |
-| ----------- | ----------------: | ---------------: |
-| C006        |               106 |                1 |
-| C002        |               104 |                2 |
-| C004        |                99 |                3 |
-| C001        |                85 |                4 |
-| C003        |                80 |                5 |
-| C007        |                58 |                6 |
-| C016        |                55 |                7 |
-| C012        |                55 |                7 |
-| C015        |                53 |                9 |
-| C009        |                52 |               10 |
-| C023        |                48 |               11 |
-| C010        |                47 |               12 |
-| C017        |                46 |               13 |
-| C008        |                45 |               14 |
-| C011        |                44 |               15 |
-| C013        |                42 |               16 |
-| C014        |                42 |               16 |
-| C022        |                36 |               18 |
-| C021        |                32 |               19 |
-| C019        |                29 |               20 |
-| C025        |                23 |               21 |
-| C020        |                19 |               22 |
+The customer-level analysis shows that repeat interaction rates vary across customers. This raises an additional business question about whether repeated interactions are also associated with particular types of customer interactions.
 
-### Finding
-
-C006 has the highest interaction volume with **106 interactions**.
-
-The ranking shows customer usage levels, but it should not be interpreted as a ranking of customer value or business performance.
-
----
-
-## Q9. What was the latest recorded interaction for each customer?
-
-```sql
-SELECT
-    customer_id,
-    interaction_id,
-    interaction_date,
-    status,
-    interaction_type_id
-FROM (
-    SELECT
-        customer_id,
-        interaction_id,
-        interaction_date,
-        status,
-        interaction_type_id,
-        ROW_NUMBER() OVER (
-            PARTITION BY customer_id
-            ORDER BY interaction_date DESC, interaction_id DESC
-        ) AS rn
-    FROM interactions
-) ranked
-WHERE rn = 1
-ORDER BY customer_id;
-```
-
-### Output
-
-| Customer ID | Interaction ID | Interaction Date | Status     | Interaction Type ID |
-| ----------- | -------------: | ---------------- | ---------- | ------------------: |
-| C001        |  Latest record | Latest date      | Status     |                Type |
-| C002        |  Latest record | 2026-09-29       | Escalated  |                   — |
-| C003        |  Latest record | Latest date      | Status     |                Type |
-| C004        |  Latest record | 2026-09-30       | Escalated  |                   — |
-| C006        |  Latest record | Latest date      | Status     |                Type |
-| C007        |  Latest record | Latest date      | Status     |                Type |
-| C008        |  Latest record | Latest date      | Status     |                Type |
-| C009        |  Latest record | Latest date      | Status     |                Type |
-| C010        |  Latest record | Latest date      | Status     |                Type |
-| C011        |  Latest record | Latest date      | Status     |                Type |
-| C012        |  Latest record | 2026-09-25       | Escalated  |                   — |
-| C013        |  Latest record | Latest date      | Status     |                Type |
-| C014        |  Latest record | 2026-09-24       | Incomplete |                   — |
-| C015        |  Latest record | Latest date      | Status     |                Type |
-| C016        |  Latest record | 2026-09-20       | Escalated  |                   — |
-| C017        |  Latest record | Latest date      | Status     |                Type |
-| C019        |  Latest record | Latest date      | Status     |                Type |
-| C020        |  Latest record | Latest date      | Status     |                Type |
-| C021        |  Latest record | Latest date      | Status     |                Type |
-| C022        |  Latest record | Latest date      | Status     |                Type |
-| C023        |  Latest record | Latest date      | Status     |                Type |
-| C025        |  Latest record | Latest date      | Status     |                Type |
-
-> **Note:** Replace the placeholder values above with the exact Q9 output from pgAdmin when pasting the README. The query itself determines the exact interaction ID, date, status, and interaction type for each customer.
-
-### Purpose
-
-This query provides the most recent interaction for each customer.
-
-`ROW_NUMBER()` is used with `PARTITION BY customer_id` so that each customer's interactions are ranked separately.
-
-The latest interaction can provide a current snapshot for follow-up analysis, but one interaction should not be treated as evidence of a customer's overall performance.
-
----
-
-## Q10. Is interaction duration data complete?
-
-```sql
-SELECT
-    COUNT(*) AS total_interactions,
-    COUNT(duration_seconds) AS interactions_with_duration,
-    COUNT(*) - COUNT(duration_seconds) AS missing_duration,
-    ROUND(
-        100.0 * (COUNT(*) - COUNT(duration_seconds))
-        / COUNT(*),
-        2
-    ) AS missing_duration_rate
-FROM interactions;
-```
-
-### Output
-
-| Metric                | Value |
-| --------------------- | ----: |
-| Total interactions    | 1,200 |
-| With duration         | 1,144 |
-| Missing duration      |    56 |
-| Missing duration rate | 4.67% |
-
-### Finding
-
-Most interaction records contain duration information, while **56 records** have missing duration values.
-
-This is primarily a data-quality check and also identifies whether duration can be reliably used in future efficiency analysis.
-
----
-
-# 5. Key Findings
-
-### 1. Interaction volume varies across customers
-
-Customer usage ranges from **19 to 106 interactions** among customers with recorded activity.
-
-### 2. Higher interaction volume does not consistently mean better outcomes
-
-Customers with fewer interactions can have higher completion rates than customers with substantially higher interaction volumes.
-
-### 3. Escalation patterns vary
-
-Escalation rates differ across interaction types, with Support showing the highest observed rate in this dataset.
-
-### 4. Interaction volume fluctuates over time
-
-Monthly interaction volume varies between January and September, with no consistent upward trend.
-
-### 5. Data quality should also be considered
-
-4.67% of interaction records have missing duration values.
-
----
-
-# 6. Additional Business Question
-
-Based on the findings, the next business question is:
-
-> **Why do some customers have higher repeat interaction rates than others?**
-
-The analysis already identifies differences in repeat rates between customers. The next step is to investigate whether repeated interactions are concentrated around particular interaction types.
+### Query
 
 ```sql
 SELECT
@@ -617,11 +482,8 @@ GROUP BY it.interaction_type
 ORDER BY repeat_rate DESC;
 ```
 
-### Purpose
+### Actual Output
 
-This query investigates whether repeated interactions are concentrated in particular interaction types.
-
-### Output
 | Interaction Type | Total Interactions | Repeated Interactions | Repeat Rate |
 | ---------------- | -----------------: | --------------------: | ----------: |
 | Support          |                217 |                    34 |      15.67% |
@@ -630,9 +492,29 @@ This query investigates whether repeated interactions are concentrated in partic
 | Booking          |                249 |                    28 |      11.24% |
 | Complaint        |                239 |                    23 |       9.62% |
 
+### Result
 
-### Finding
-Support has the highest observed repeat interaction rate at 15.67%, followed by Cancellation at 12.45%. Complaint has the lowest observed repeat rate at 9.62%.
+**Support** has the highest observed repeat interaction rate at **15.67%**, while **Complaint** has the lowest at **9.62%**.
+
+This shows that repeated interactions are not distributed equally across interaction types and provides a direction for further customer-level investigation.
+
+---
+
+# 6. Final Key Findings
+
+1. **Customer interaction volume varies significantly**, ranging from 19 to 106 interactions among customers with recorded activity.
+
+2. **Higher interaction volume does not consistently correspond to higher completion rates.**
+
+3. **Escalations are concentrated among some customers**, with C004 recording the highest number of escalated interactions.
+
+4. **Escalation rates vary by interaction type**, with Support showing the highest observed rate at 17.97%.
+
+5. **Interaction volume fluctuates over time**, rather than showing a consistent upward trend.
+
+6. **Month-over-month changes confirm these fluctuations**, with both increases and decreases across the period.
+
+7. **Repeat interaction rates vary by interaction type**, with Support showing the highest observed repeat rate at 15.67%.
 
 ---
 
@@ -640,21 +522,18 @@ Support has the highest observed repeat interaction rate at 15.67%, followed by 
 
 The analysis shows that **higher interaction volume does not consistently correspond to better operational outcomes in the dataset**.
 
-Some high-volume customers have lower completion rates than customers with substantially fewer interactions. This indicates that interaction volume alone should not be treated as a measure of successful VoiceFlow usage.
+Some high-volume customers have lower completion rates than customers with substantially fewer interactions.
 
-Escalation, repeat interactions, and monthly activity provide additional context around customer usage and outcomes.
+For example:
 
-Therefore, VoiceFlow should evaluate interaction volume together with outcome indicators rather than interpreting increasing interaction counts alone as evidence of improved performance.
+* **C004:** 99 interactions → 65.66% completion
+* **C009:** 52 interactions → 84.62% completion
+* **C021:** 32 interactions → 87.50% completion
 
-### Scope of the Analysis
+This indicates that **interaction volume alone should not be treated as a measure of successful VoiceFlow usage**.
 
-The current dataset measures **operational outcomes** such as:
+The escalation, repeat-interaction, and time-based analyses provide additional evidence that customer outcomes and interaction patterns vary across customers, interaction types, and time periods.
 
-* Completed interactions
-* Escalated interactions
-* Incomplete interactions
-* Repeated interactions
+Therefore, the answer to the main business question is:
 
-It does **not** contain financial metrics such as revenue, ROI, cost savings, or customer satisfaction. Therefore, the analysis does not claim to measure financial business value directly.
-
-Further analysis could introduce reliable business-value metrics to investigate the relationship between interaction volume and financial outcomes.
+> **A higher number of interactions does not necessarily mean better business outcomes for VoiceFlow customers.**
